@@ -4,7 +4,7 @@ import { CURRENT_USER } from "./mock/users";
 
 let user = $state(CURRENT_USER);
 let wallet = $state({ tokens: 100 });
-let papers = $state(defaultPapers);
+let papersState: { papers: PaperInfo[] } = $state({ papers: defaultPapers });
 
 export const REQUIRED_REVIEW_TOKENS = 10;
 
@@ -16,12 +16,12 @@ export function getTokensStore(): { tokens: number } {
     return wallet;
 }
 
-export function getPapersStore(): PaperInfo[] {
-    return papers;
+export function getPapersStore(): { papers: PaperInfo[] } {
+    return papersState;
 }
 
 export function addPaper(paperData: PaperUploadInfo) {
-    const currentPapers = papers;
+    const currentPapers = papersState.papers;
     const currentUser = user;
     const newPaper: PaperInfo = {
         id: currentPapers.length + 1,
@@ -32,7 +32,7 @@ export function addPaper(paperData: PaperUploadInfo) {
         status: 'under_review',
         uploadDate: new Date(),
     };
-    papers = [...currentPapers, newPaper];
+    papersState.papers = [...currentPapers, newPaper];
 }
 
 export function submitReview(reviewData: ReviewUploadData) {
@@ -40,7 +40,7 @@ export function submitReview(reviewData: ReviewUploadData) {
         throw new Error('Not enough tokens');
     }
 
-    const currentPapers = papers;
+    const currentPapers = papersState.papers;
     const currentUser = user;
     const paperIndex = currentPapers.findIndex(p => p.id == reviewData.paperId);
     if (paperIndex < 0) {
